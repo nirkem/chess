@@ -1,0 +1,29 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "build",
+			"type": "shell",
+			"command": "g++",
+			"args": [
+				"-I.",
+				"-g",
+				"Chess.cpp",
+				"sources/Board.cpp",
+				"sources/Pawn.cpp",
+				"sources/Bishop.cpp",
+				"sources/Knight.cpp",
+				"sources/Rook.cpp",
+				"sources/King.cpp",
+				"sources/Queen.cpp",
+				"-o",
+				"Chess.exe"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": ["$gcc"]
+		}
+	]
+}
