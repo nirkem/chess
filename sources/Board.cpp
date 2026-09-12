@@ -9,6 +9,19 @@
 
 using namespace std;
 
+
+// ------- Ctor Dtor ---------
+Board::Board() {
+    legal_col_row = { 1, 4, 7, 10, 13, 16, 19, 22 };
+    place_pieces();
+}
+
+Board::~Board() {
+    for (Piece* p : pieces) {
+        delete p;
+    }
+}
+
 void Board::delete_piece(Piece& piece) {
     // Get pointer to the object
     Piece* ptr = &piece;
@@ -68,10 +81,7 @@ int* convert_string_to_col_row(string move) {
     return ans;
 }
 
-Board::Board() {
-    legal_col_row = { 1, 4, 7, 10, 13, 16, 19, 22 };
-    place_pieces();
-}
+
 
 void Board::display_board() {
     std::cout << std::endl << std::endl;
@@ -136,10 +146,13 @@ void Board::display_board() {
 
 bool Board::move(string move, int turn) {
 
+    // check if legal move
     if (!is_legit_string(move)) return false;
 
+    // provide check bacground
     bool wasInCheck = in_check;
 
+    // convert move to a list of ints representing the move
     int* ans = convert_string_to_col_row(move);
 
     int origin_col = ans[0];
@@ -148,6 +161,10 @@ bool Board::move(string move, int turn) {
     int dst_row = ans[3];
     int new_piece = ans[4];
 
+    delete ans;
+    ans = nullptr;
+
+    // get moving piece
     Piece* piece = brd[3 * (origin_col - 1) + 1][3 * (origin_row - 1) + 1];
     if (piece == nullptr) {
         cout << "No piece at origin." << endl;
@@ -167,6 +184,7 @@ bool Board::move(string move, int turn) {
     }
     else {
         // handle regular move
+        // get destenation spot
         Piece* dst = brd[3 * (dst_col - 1) + 1][3 * (dst_row - 1) + 1];
         if (dst == nullptr) {
             // perform regular move
@@ -268,7 +286,10 @@ bool Board::move(string move, int turn) {
     return true;
 }
 
-void Board::place_pieces() {
+
+
+// ------- Creating pieces ---------
+void Board::create_pawns() {
     // Create black Pawns
     for (int col = 0; col < 8; col++) {
         brd[3 * col + 1][4] = new Pawn(3 * col + 1, 4, false);
@@ -280,7 +301,9 @@ void Board::place_pieces() {
         brd[3 * col + 1][19] = new Pawn(3 * col + 1, 19, true);
         pieces.push_back(brd[3 * col + 1][19]);
     }
+}
 
+void Board::create_rooks() {
     // Create Rook 
     brd[1][1] = new Rook(1, 1, false);
     brd[22][1] = new Rook(22, 1, false);
@@ -290,15 +313,9 @@ void Board::place_pieces() {
     pieces.push_back(brd[1][22]);
     pieces.push_back(brd[22][1]);
     pieces.push_back(brd[22][22]);
+}
 
-    // Create Knight
-    brd[4][1] = new Knight(4, 1, false); brd[19][1] = new Knight(19, 1, false);
-    brd[4][22] = new Knight(4, 22, true); brd[19][22] = new Knight(19, 22, true);
-    pieces.push_back(brd[4][1]);
-    pieces.push_back(brd[19][1]);
-    pieces.push_back(brd[4][22]);
-    pieces.push_back(brd[19][22]);
-
+void Board::create_bishops() {
     // Create Bishop
     brd[7][1] = new Bishop(7, 1, false); brd[16][1] = new Bishop(16, 1, false);
     brd[7][22] = new Bishop(7, 22, true); brd[16][22] = new Bishop(16, 22, true);
@@ -306,7 +323,19 @@ void Board::place_pieces() {
     pieces.push_back(brd[16][1]);
     pieces.push_back(brd[7][22]);
     pieces.push_back(brd[16][22]);
+}
 
+void Board::create_knights() {
+    // Create Knight
+    brd[4][1] = new Knight(4, 1, false); brd[19][1] = new Knight(19, 1, false);
+    brd[4][22] = new Knight(4, 22, true); brd[19][22] = new Knight(19, 22, true);
+    pieces.push_back(brd[4][1]);
+    pieces.push_back(brd[19][1]);
+    pieces.push_back(brd[4][22]);
+    pieces.push_back(brd[19][22]);
+}
+
+void Board::create_royalty() {
     // Create Queen
     brd[13][1] = new Queen(13, 1, false);
     brd[13][22] = new Queen(13, 22, true);
@@ -321,7 +350,16 @@ void Board::place_pieces() {
 
     pieces.push_back(black_king);
     pieces.push_back(white_king);
+}
 
+void Board::place_pieces() {
+    create_pawns();
+    create_rooks();
+    create_bishops();
+    create_knights();
+    create_royalty();
+
+    // keep vector of black and white pieces
     for (const auto& piece : pieces) {
         if (piece->isWhite()) {
             white_pieces.push_back(piece);

@@ -49,5 +49,6 @@ int main() {
         
     }
 
+    delete(board);
     return 0;
 }
